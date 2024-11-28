@@ -2,7 +2,7 @@ import secrets
 import string
 from datetime import datetime, timedelta, timezone
 from email.policy import default
-from typing import List, Annotated
+from typing import List, Annotated, Literal
 
 from sqlalchemy import Integer, func, ForeignKey, DateTime, BigInteger
 from sqlalchemy.orm import mapped_column, Mapped, relationship
@@ -25,8 +25,12 @@ class User(Base):
     email: Mapped[str|None] = mapped_column(unique=True)
     registered_at: Mapped[created_at]
     photo_url: Mapped[str|None]
+    tether_balance: Mapped[float] = mapped_column(default=0.0)
 
     tgauthtoken: Mapped[List['TgAuthToken']] = relationship()
+    payout: Mapped[List['Payout']] = relationship()
+    top_up: Mapped[List['TopUp']] = relationship()
+    active_application: Mapped[List['ActiveApplication']] = relationship()
 
     def __str__(self):
         return f'User: {self.id=}, {self.tg_username=}, {self.role=}'
@@ -48,4 +52,33 @@ class TgAuthToken(Base):
 
     def __str__(self):
         return f'TgAuthToken: {self.id=}, {self.created_at=}, {self.end_at=}, {self.token=}'
+
+class Payout(Base):
+    id = mapped_column(Integer, primary_key=True)
+    user_pk: Mapped[int] = mapped_column(ForeignKey('user_table.id'))
+    to_currency: Mapped[str]
+    pre_balance: Mapped[float]
+    post_balance: Mapped[float]
+    datetime: Mapped[created_at]
+    amount: Mapped[float]
+    amount_in_usd: Mapped[float]
+
+class TopUp(Base):
+    id = mapped_column(Integer, primary_key=True)
+    user_pk: Mapped[int] = mapped_column(ForeignKey('user_table.id'))
+    datetime: Mapped[created_at]
+    transaction_hash: Mapped[str]
+    amount: Mapped[float]
+    amount_in_usd: Mapped[float]
+    pre_balance: Mapped[float]
+    post_balance: Mapped[float]
+
+class ActiveApplication(Base):
+    id = mapped_column(Integer, primary_key=True)
+    user_pk: Mapped[int] = mapped_column(ForeignKey('user_table.id'))
+    datetime: Mapped[created_at]
+    type: Mapped[Literal['topup', 'payout']]
+    amount: Mapped[float]
+    currency: Mapped[Literal['tether']] = mapped_column(default='tether')
+    expired_at: Mapped[datetime|None] = mapped_column(DateTime(timezone=True))
 

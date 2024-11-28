@@ -6,8 +6,7 @@ import './index.css';
 
 import Auth from './auth/Auth.jsx';
 import Home from './home/Home.jsx';
-import axios from 'axios';
-import { api_url } from './config.jsx';
+import { api_url, axiinstance } from './config.jsx';
 
 function ProtectedRoute({ isAuthenticated, redirectTo, children }) {
   if (!isAuthenticated) {
@@ -24,7 +23,7 @@ function App() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const response = await axios.get(api_url + 'auth/check_auth/', { withCredentials: true });
+        const response = await axiinstance.get('auth/check_auth/');
         setIsAuthenticated(response.data.valid_auth);
         if (response.data.valid_auth) setUserId(response.data.id);
       } catch (error) {

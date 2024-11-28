@@ -1,6 +1,5 @@
 import { useState } from "react"
-import { api_url } from '../config.jsx'
-import axios from "axios"
+import { api_url, axiinstance } from '../config.jsx'
 
 const auth_api = api_url + 'auth/'
 
@@ -43,7 +42,9 @@ export default function Auth() {
             return
         }
         
-        const response = await axios.get(auth_api + 'check_token/?token=' + token, {withCredentials: true})
+        const response = await axiinstance.post('auth/check_token/', {
+            token: token
+        })
         console.log(response)
         const valid_token = response.data['valid_token']
         if(valid_token == false) {

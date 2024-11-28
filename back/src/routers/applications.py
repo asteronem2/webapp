@@ -1,9 +1,13 @@
+from datetime import datetime, UTC, timedelta
 import traceback
+from typing import Annotated
 
 import httpx
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, Body
 from pydantic import BaseModel
+from fastapi.exceptions import HTTPException
 
+from src.core import ActiveApplicationCore
 from src.tg_bot.tg_bot import bot
 
 router = APIRouter(prefix='', tags=['Заявки'])
@@ -44,4 +48,20 @@ async def main_page(application: ApplicationModel):
              f'Банк: {eng_to_rus_bank[application.bank]}\n'
              f'Номер (карта или телефон): {application.number}\n'
 
+    )
+
+class Amount(BaseModel):
+    amount: int|float
+
+@router.post('/create_topup/')
+async def top_up(request: Request, amount: float = Body(embed=True)):
+    user_id = request.state.user_id
+    user_applications = await ActiveApplicationCore.find_one(user_pk=user_id, type='topup')
+    if user_applications:
+        raise HTTPException(400, 'There is already an application')
+    await ActiveApplicationCore.add(
+        user_pk=user_id,
+        type='topup',
+        expired_at=datetime.now(UTC) + timedelta(minutes=30),
+        amount=amount
     )

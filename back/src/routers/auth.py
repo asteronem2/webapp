@@ -2,11 +2,10 @@ import re
 from datetime import UTC, datetime
 from typing import Literal, Union
 
-import fastapi
-from fastapi import APIRouter, Response, Request
+from fastapi import APIRouter, Response, Request, Body
 from pydantic import BaseModel
 
-from src.auth.auth import create_jwt_token, decode_jwt_token
+from src.utils import Auth as AuthMethods
 from src.core import TgAuthTokenCore, UserCore
 from src.models import User
 
@@ -41,17 +40,15 @@ async def check_auth(request: Request):
     if not token:
         return {'valid_auth': False, 'info': 'no cookies'}
 
-    result = await decode_jwt_token(token)
+    result = await AuthMethods.decode_jwt_token(token)
     if type(result) == str:
         return {'valid_auth': False, 'info': result}
 
     return {'valid_auth': True, 'id': result}
 
-@router.get('/check_token/')
-async def check_token(response: Response, token: str):
+@router.post('/check_token/')
+async def check_token(response: Response, token: str = Body(..., embed=True)):
     db_token = await TgAuthTokenCore.find_one(token=token)
-    print(f'{db_token=}')
-    answer = None
     db_user = User
     if not db_token:
         answer = CheckToken(valid_token=False, info=check_errors(token) or 'not_exists')
@@ -75,11 +72,8 @@ async def check_token(response: Response, token: str):
             login_options=login_options,
         )
 
-    print(f'{answer=}')
     if answer.valid_token:
-        access_token = create_jwt_token({'sub': str(db_user.id)})
-        print(f'{access_token=}')
+        access_token = AuthMethods.create_jwt_token({'sub': str(db_user.id)})
         response.set_cookie(key='user_access_token', value=access_token, httponly=True, samesite='none', secure=True)
-        print('success')
-
+    print(answer)
     return answer

@@ -5,7 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import update
 
 from database import async_session_maker, Base
-from src.models import User, TgAuthToken
+from src.models import User, TgAuthToken, Payout, TopUp, ActiveApplication
+
 
 class BaseCore:
     model = None
@@ -67,6 +68,7 @@ class BaseCore:
                 await session.commit()
                 return result.rowcount
 
+
 class UserCore(BaseCore):
     model = User
 
@@ -83,8 +85,60 @@ class UserCore(BaseCore):
         core.model = cls.model
         return await core.find_one(order_by, order_type, **filter_by)
 
+
 class TgAuthTokenCore(BaseCore):
     model = TgAuthToken
+
+    @classmethod
+    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
+        core = BaseCore
+        core.model = cls.model
+        # noinspection PyTypeChecker
+        return await core.find_all(order_by, order_type, **filter_by)
+
+    @classmethod
+    async def find_one(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> Optional[model]:
+        core = BaseCore
+        core.model = cls.model
+        return await core.find_one(order_by, order_type, **filter_by)
+
+
+class PayoutCore(BaseCore):
+    model = Payout
+
+    @classmethod
+    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
+        core = BaseCore
+        core.model = cls.model
+        # noinspection PyTypeChecker
+        return await core.find_all(order_by, order_type, **filter_by)
+
+    @classmethod
+    async def find_one(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> Optional[model]:
+        core = BaseCore
+        core.model = cls.model
+        return await core.find_one(order_by, order_type, **filter_by)
+
+
+class TopUpCore(BaseCore):
+    model = TopUp
+
+    @classmethod
+    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
+        core = BaseCore
+        core.model = cls.model
+        # noinspection PyTypeChecker
+        return await core.find_all(order_by, order_type, **filter_by)
+
+    @classmethod
+    async def find_one(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> Optional[model]:
+        core = BaseCore
+        core.model = cls.model
+        return await core.find_one(order_by, order_type, **filter_by)
+
+
+class ActiveApplicationCore(BaseCore):
+    model = ActiveApplication
 
     @classmethod
     async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
