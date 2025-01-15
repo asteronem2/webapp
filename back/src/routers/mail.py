@@ -8,7 +8,6 @@ from fastapi import Request, HTTPException
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from src.auth.auth import decode_jwt_token
 from src.core import UserCore
 
 router = APIRouter(prefix='', tags=['Почта'])

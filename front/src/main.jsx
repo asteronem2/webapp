@@ -4,9 +4,10 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
 
-import Auth from './auth/Auth.jsx';
-import Home from './home/Home.jsx';
-import { api_url, axiinstance } from './config.jsx';
+import Auth from './Auth.jsx';
+import Home from './Home.jsx';
+import { axiinstance } from './config.jsx';
+import Admin from "./Admin.jsx";
 
 function ProtectedRoute({ isAuthenticated, redirectTo, children }) {
   if (!isAuthenticated) {
@@ -41,8 +42,13 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
+        <Route
+            path='/admin/*'
+            element={<Admin/>}
+        />
+
         {/* Если пользователь авторизован, перенаправляем на /profile */}
         <Route path="/" element={<Navigate to={isAuthenticated ? '/profile' : '/auth'} />} />
 

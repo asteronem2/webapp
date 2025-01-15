@@ -20,3 +20,5 @@ TOKEN_LIFETIME = 12#minutes
 frontend_url = 'https://google.com/'
 
 CRYPTOADDRESS = 'TEDepUJidzXfCkHtDmWhAPQiTibhiRE2C5'
+
+ADMIN_TOKEN = '197685:DF3KijgREdqjzRFuylb0MTIh'

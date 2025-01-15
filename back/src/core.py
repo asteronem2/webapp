@@ -1,22 +1,27 @@
 from typing import Literal, Union, List, Optional
 
-from sqlalchemy import select, delete, asc, desc
+from sqlalchemy import select, delete, asc, desc, update
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import update
+from sqlalchemy.orm import joinedload
 
 from database import async_session_maker, Base
-from src.models import User, TgAuthToken, Payout, TopUp, ActiveApplication
+from src.models import User, TgAuthToken, Withdraw, TopUp, ActiveApplication, Pattern, PatternField, Currency
 
 
 class BaseCore:
     model = None
 
     @classmethod
-    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
+    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', limit: int = None, **filter_by) -> List[model]:
         order_type: Union[asc, desc] = asc if order_type == 'asc' else desc
 
         async with async_session_maker() as session:
-            query = select(cls.model).filter_by(**filter_by).order_by(order_type(order_by))
+            query = (
+                select(cls.model)
+                .filter_by(**filter_by)
+                .order_by(order_type(order_by))
+                .limit(limit)
+            )
             res = await session.execute(query)
             return res.scalars().all()
 
@@ -25,7 +30,12 @@ class BaseCore:
         order_type: Union[asc, desc] = asc if order_type == 'asc' else desc
 
         async with async_session_maker() as session:
-            query = select(cls.model).filter_by(**filter_by).limit(1).order_by(order_type(order_by))
+            query = (
+                select(cls.model)
+                .filter_by(**filter_by)
+                .limit(1)
+                .order_by(order_type(order_by))
+            )
             res = await session.execute(query)
             return res.scalars().one_or_none()
 
@@ -63,7 +73,7 @@ class BaseCore:
     async def delete(cls, **filter_by) -> int:
         async with async_session_maker() as session:
             async with session.begin():
-                query = delete(cls.model).where(**filter_by)
+                query = delete(cls.model).where(*[getattr(cls.model, k) == v for k, v in filter_by.items()])
                 result = await session.execute(query)
                 await session.commit()
                 return result.rowcount
@@ -72,83 +82,23 @@ class BaseCore:
 class UserCore(BaseCore):
     model = User
 
-    @classmethod
-    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
-        core = BaseCore
-        core.model = cls.model
-        # noinspection PyTypeChecker
-        return await core.find_all(order_by, order_type, **filter_by)
-
-    @classmethod
-    async def find_one(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> Optional[model]:
-        core = BaseCore
-        core.model = cls.model
-        return await core.find_one(order_by, order_type, **filter_by)
-
-
 class TgAuthTokenCore(BaseCore):
     model = TgAuthToken
 
-    @classmethod
-    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
-        core = BaseCore
-        core.model = cls.model
-        # noinspection PyTypeChecker
-        return await core.find_all(order_by, order_type, **filter_by)
-
-    @classmethod
-    async def find_one(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> Optional[model]:
-        core = BaseCore
-        core.model = cls.model
-        return await core.find_one(order_by, order_type, **filter_by)
-
-
-class PayoutCore(BaseCore):
-    model = Payout
-
-    @classmethod
-    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
-        core = BaseCore
-        core.model = cls.model
-        # noinspection PyTypeChecker
-        return await core.find_all(order_by, order_type, **filter_by)
-
-    @classmethod
-    async def find_one(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> Optional[model]:
-        core = BaseCore
-        core.model = cls.model
-        return await core.find_one(order_by, order_type, **filter_by)
-
+class WithdrawCore(BaseCore):
+    model = Withdraw
 
 class TopUpCore(BaseCore):
     model = TopUp
 
-    @classmethod
-    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
-        core = BaseCore
-        core.model = cls.model
-        # noinspection PyTypeChecker
-        return await core.find_all(order_by, order_type, **filter_by)
-
-    @classmethod
-    async def find_one(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> Optional[model]:
-        core = BaseCore
-        core.model = cls.model
-        return await core.find_one(order_by, order_type, **filter_by)
-
-
 class ActiveApplicationCore(BaseCore):
     model = ActiveApplication
 
-    @classmethod
-    async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> List[model]:
-        core = BaseCore
-        core.model = cls.model
-        # noinspection PyTypeChecker
-        return await core.find_all(order_by, order_type, **filter_by)
+class PatternCore(BaseCore):
+    model = Pattern
 
-    @classmethod
-    async def find_one(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', **filter_by) -> Optional[model]:
-        core = BaseCore
-        core.model = cls.model
-        return await core.find_one(order_by, order_type, **filter_by)
+class PatternFieldCore(BaseCore):
+    model = PatternField
+
+class CurrencyCore(BaseCore):
+    model = Currency

@@ -1,7 +1,6 @@
 import asyncio
 import json
 import time
-from idlelib.pyparse import trans
 from typing import Union, Literal
 
 from passlib.context import CryptContext
@@ -11,7 +10,6 @@ import httpx
 
 import config
 from src.core import UserCore, ActiveApplicationCore, TopUpCore
-from src.routers.applications import ApplicationModel
 
 
 class Auth:
@@ -35,7 +33,7 @@ class Auth:
 
     @staticmethod
     async def decode_jwt_token(token: str) -> Union[
-        int, Literal['incorrect_token', 'lifetime_expired', 'user_not_found']
+        int, str, Literal['incorrect_token', 'lifetime_expired', 'user_not_found']
     ]:
         try:
             payload = jwt.decode(token, config.SECRET, 'HS256')
@@ -53,6 +51,8 @@ class Auth:
         user_id = payload.get('sub')
         if not user_id:
             return 'user_not_found'
+        elif user_id == 'admin':
+            return 'admin'
 
         user_db = await UserCore.find_one(id=int(user_id))
         if not user_db:
