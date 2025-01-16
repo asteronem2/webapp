@@ -3,6 +3,9 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile
+      args:
+      - DB_USER=${DB_USER}
+      - DB_NAME=${DB_NAME}
     ports:
       - "8000:8000"
     volumes:
