@@ -7,8 +7,7 @@ services:
       - DB_USER=$DB_USER
       - DB_NAME=$DB_NAME
       - DB_HOST=$DB_HOST
-      extra_hosts:
-        - "host.docker.internal:host-gateway"
+      - DB_PASS=$DB_PASS
     ports:
       - "8000:8000"
     volumes:
