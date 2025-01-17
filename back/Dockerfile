@@ -18,7 +18,7 @@ ARG DB_PASS
 COPY . .
 
 RUN apt-get update && apt-get install -y postgresql-client
-RUN PGPASSWORD=\'${DB_PASS}\' psql -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} -c "DROP TABLE IF EXISTS alembic_version;"
+RUN PGPASSWORD=${DB_PASS} psql -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} -c "DROP TABLE IF EXISTS alembic_version;"
 RUN alembic stamp head
 RUN alembic revision --autogenerate -m "new_revision"
 RUN alembic upgrade head
