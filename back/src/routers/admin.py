@@ -16,7 +16,7 @@ router = APIRouter(prefix='', tags=['Админ панель'])
 async def auth(response: Response, token: str = Body(..., embed=True)):
     if token == config.ADMIN_TOKEN:
         admin_access_token = utils.Auth.create_jwt_token({'sub': 'admin'})
-        response.set_cookie(key='admin_access_token', value=admin_access_token, httponly=True, samesite='none', secure=True)
+        response.set_cookie(key='admin_access_token', value=admin_access_token, httponly=True, samesite='lax', secure=False)
         return {'access': True}
     else:
         return {'access': False}
