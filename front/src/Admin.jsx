@@ -13,6 +13,9 @@ const statuses = {
     'reject': 'Отклонено'
 }
 
+const fullscreenEnterSvg = 'M18.5,5.5 L16,5.5 C15.1716,5.5 14.5,4.82843 14.5,4 C14.5,3.17157 15.1716,2.5 16,2.5 L19,2.5 C20.3807,2.5 21.5,3.61929 21.5,5 L21.5,8 C21.5,8.82843 20.8284,9.5 20,9.5 C19.1716,9.5 18.5,8.82843 18.5,8 L18.5,5.5 Z M8,5.5 L5.5,5.5 L5.5,8 C5.5,8.82843 4.82843,9.5 4,9.5 C3.17157,9.5 2.5,8.82843 2.5,8 L2.5,5 C2.5,3.61929 3.61929,2.5 5,2.5 L8,2.5 C8.82843,2.5 9.5,3.17157 9.5,4 C9.5,4.82843 8.82843,5.5 8,5.5 Z M8,18.5 L5.5,18.5 L5.5,16 C5.5,15.1716 4.82843,14.5 4,14.5 C3.17157,14.5 2.5,15.1716 2.5,16 L2.5,19 C2.5,20.3807 3.61929,21.5 5,21.5 L8,21.5 C8.82843,21.5 9.5,20.8284 9.5,20 C9.5,19.1716 8.82843,18.5 8,18.5 Z M16,18.5 L18.5,18.5 L18.5,16 C18.5,15.1716 19.1716,14.5 20,14.5 C20.8284,14.5 21.5,15.1716 21.5,16 L21.5,19 C21.5,20.3807 20.3807,21.5 19,21.5 L16,21.5 C15.1716,21.5 14.5,20.8284 14.5,20 C14.5,19.1716 15.1716,18.5 16,18.5 Z'
+const fullscreenExitSvg = 'M17.5,6.5 L20,6.5 C20.8284,6.5 21.5,7.17157 21.5,8 C21.5,8.82843 20.8284,9.5 20,9.5 L17,9.5 C15.6193,9.5 14.5,8.38071 14.5,7 L14.5,4 C14.5,3.17157 15.1716,2.5 16,2.5 C16.8284,2.5 17.5,3.17157 17.5,4 L17.5,6.5 Z M4,6.5 L6.5,6.5 L6.5,4 C6.5,3.17157 7.17157,2.5 8,2.5 C8.82843,2.5 9.5,3.17157 9.5,4 L9.5,7 C9.5,8.38071 8.38071,9.5 7,9.5 L4,9.5 C3.17157,9.5 2.5,8.82843 2.5,8 C2.5,7.17157 3.17157,6.5 4,6.5 Z M4,17.5 L6.5,17.5 L6.5,20 C6.5,20.8284 7.17157,21.5 8,21.5 C8.82843,21.5 9.5,20.8284 9.5,20 L9.5,17 C9.5,15.6193 8.38071,14.5 7,14.5 L4,14.5 C3.17157,14.5 2.5,15.1716 2.5,16 C2.5,16.8284 3.17157,17.5 4,17.5 Z M20,17.5 L17.5,17.5 L17.5,20 C17.5,20.8284 16.8284,21.5 16,21.5 C15.1716,21.5 14.5,20.8284 14.5,20 L14.5,17 C14.5,15.6193 15.6193,14.5 17,14.5 L20,14.5 C20.8284,14.5 21.5,15.1716 21.5,16 C21.5,16.8284 20.8284,17.5 20,17.5 Z'
+
 function Auth() {
     const [token, setToken] = useState('');
     const [tokenError, setTokenError] = useState(false);
@@ -82,6 +85,7 @@ function Withdraws() {
     const [modal, setModal] = useState(null)
     const [inputTagId, setInputTagId] = useState(null)
     const inputRef = useRef(null)
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     function sortArrow(field) {
         if (field === sortConfig.field) {
@@ -158,7 +162,7 @@ function Withdraws() {
     }, [inputTagId]);
 
     return (
-        <div className='withdraws'>
+        <div className={`withdraws ${isFullscreen ? 'fullscreen' : ''}`}>
             {modal && (
                 <div className='modal' onClick={(event) => {
                     if (event.target === event.currentTarget) {
@@ -169,55 +173,60 @@ function Withdraws() {
                         <div className="modal-tab" onClick={(event) => {
                             if (event.target.className !== 'inactive' && event.target.tagName === 'BUTTON') {
                                 setModal(null);
-                            }}}>
+                            }
+                        }}>
                             <h3>Сортировать по:</h3>
                             <button
                                 className={sortConfig.field === 'datetime' && sortConfig.direction === 'desc' ? 'inactive' : ''}
                                 onClick={() => setSortConfig({field: 'datetime', direction: 'desc', name: 'Новые'})}
-                            >Новые</button>
+                            >Новые
+                            </button>
                             <button
                                 className={sortConfig.field === 'datetime' && sortConfig.direction === 'asc' ? 'inactive' : ''}
                                 onClick={() => setSortConfig({field: 'datetime', direction: 'asc', name: 'Старые'})}
-                            >Старые</button>
+                            >Старые
+                            </button>
                             <button
                                 className={sortConfig.field === 'amount' && sortConfig.direction === 'desc' ? 'inactive' : ''}
-                                onClick={() => setSortConfig({field: 'amount', direction: 'desc', name: 'Сумма больше'})}
-                            >Сумма больше</button>
+                                onClick={() => setSortConfig({
+                                    field: 'amount',
+                                    direction: 'desc',
+                                    name: 'Сумма больше'
+                                })}
+                            >Сумма больше
+                            </button>
                             <button
                                 className={sortConfig.field === 'amount' && sortConfig.direction === 'asc' ? 'inactive' : ''}
                                 onClick={() => setSortConfig({field: 'amount', direction: 'asc', name: 'Сумма меньше'})}
-                            >Сумма меньше</button>
-                            <button
-                                className={sortConfig.field === 'amount_in_usd' && sortConfig.direction === 'desc' ? 'inactive' : ''}
-                                onClick={() => setSortConfig({field: 'amount_in_usd', direction: 'desc', name: 'Сумма $ больше'})}
-                            >Сумма $ больше</button>
-                            <button
-                                className={sortConfig.field === 'amount_in_usd' && sortConfig.direction === 'asc' ? 'inactive' : ''}
-                                onClick={() => setSortConfig({field: 'amount_in_usd', direction: 'asc', name: 'Сумма $ меньше'})}
-                            >Сумма $ меньше</button>
+                            >Сумма меньше
+                            </button>
                         </div>
                     )}
                     {modal === 'filter' && (
                         <div className='modal-tab filter'>
                             <div className='amount'>
                                 <h3>Сумма</h3>
-                                <div className='checkbox' onClick={() => {
-                                    setFilterConfig({...filterConfig, amount: {...filterConfig.amount, in_usd: !filterConfig.amount.in_usd}})
-                                }}>
-                                    <input type="checkbox" checked={filterConfig.amount.in_usd}/>
-                                    <p>в долларах</p>
-                                </div>
-                                От: <input type="text" className='input-text' value={filterConfig.amount.min} onChange={(event) => {
-                                    if (/^(\d*|\d+[,.]\d*)$/.test(event.target.value)) {
-                                        const new_value = event.target.value.replace(/,/, '.')
-                                        setFilterConfig({...filterConfig, amount: {...filterConfig.amount, min: new_value}})
-                                    }}}
-                                /> до: <input type="text" className='input-text' value={filterConfig.amount.max} onChange={(event) => {
-                                if (/^(\d*|\d+[,.]\d*)$/.test(event.target.value)) {
-                                    const new_value = event.target.value.replace(/,/, '.')
-                                    setFilterConfig({...filterConfig, amount: {...filterConfig.amount, max: new_value}})
-                                    }}}
-                                />
+                                От: <input type="text" className='input-text' value={filterConfig.amount.min}
+                                           onChange={(event) => {
+                                               if (/^(\d*|\d+[,.]\d*)$/.test(event.target.value)) {
+                                                   const new_value = event.target.value.replace(/,/, '.')
+                                                   setFilterConfig({
+                                                       ...filterConfig,
+                                                       amount: {...filterConfig.amount, min: new_value}
+                                                   })
+                                               }
+                                           }}
+                            /> до: <input type="text" className='input-text' value={filterConfig.amount.max}
+                                          onChange={(event) => {
+                                              if (/^(\d*|\d+[,.]\d*)$/.test(event.target.value)) {
+                                                  const new_value = event.target.value.replace(/,/, '.')
+                                                  setFilterConfig({
+                                                      ...filterConfig,
+                                                      amount: {...filterConfig.amount, max: new_value}
+                                                  })
+                                              }
+                                          }}
+                            />
                             </div>
                             <div className={`banks${!filterVisible.banks ? ' minimized' : ''}`}>
                                 <h3
@@ -284,100 +293,91 @@ function Withdraws() {
             )}
             <div className='filter_and_sort'>
                 <button className='sort' onClick={() => setModal('sort')}>
-                    <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='currentColor'>
-                        <path d='M 4.207,-2.798598e-8 0,4.207 1.414,5.621 3.207,3.828 v 10.586 h 2 V 3.828 L 7,5.621 8.414,4.207 Z M 11.207,14.828 7,10.621 8.414,9.207 10.207,11 V 0.41399997 h 2 V 11 L 14,9.207 l 1.414,1.414 z'/>
+                    <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'
+                         fill='currentColor'>
+                        <path
+                            d='M 4.207,-2.798598e-8 0,4.207 1.414,5.621 3.207,3.828 v 10.586 h 2 V 3.828 L 7,5.621 8.414,4.207 Z M 11.207,14.828 7,10.621 8.414,9.207 10.207,11 V 0.41399997 h 2 V 11 L 14,9.207 l 1.414,1.414 z'/>
                     </svg>
                     &nbsp;{sortConfig.name}
                 </button>
                 <button className='filter' onClick={() => setModal('filter')}>
-                Фильтры
+                    Фильтры
                 </button>
             </div>
+            <svg className='fullscreen-button' xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='currentColor' onClick={() => {setIsFullscreen(!isFullscreen)}}>
+                <path d={isFullscreen ? fullscreenExitSvg : fullscreenEnterSvg} fill='#64748b'/>
+            </svg>
             <div className='table'>
                 <table>
                     <thead>
-                        <tr>
-                            <th
-                                onClick={() => {
-                                    if (sortConfig.field === 'datetime') {
-                                        if (sortConfig.direction === 'asc') {
-                                            setSortConfig({field: 'datetime', direction: 'desc', name: 'Новые'})
-                                        } else {
-                                            setSortConfig({field: 'datetime', direction: 'asc', name: 'Старые'})
-                                        }
-                                    } else {
+                    <tr>
+                        <th
+                            onClick={() => {
+                                if (sortConfig.field === 'datetime') {
+                                    if (sortConfig.direction === 'asc') {
                                         setSortConfig({field: 'datetime', direction: 'desc', name: 'Новые'})
-                                    }
-                                }}
-                            >Дата{sortArrow('datetime')}</th>
-                            <th>Пользователь</th>
-                            <th>Телефон</th>
-                            <th>Карта</th>
-                            <th>Получатель</th>
-                            <th>Банк</th>
-                            <th>Метка</th>
-                            <th>Статус</th>
-                            <th>Валюта</th>
-                            <th
-                                onClick={() => {
-                                    if (sortConfig.field === 'amount') {
-                                        if (sortConfig.direction === 'asc') {
-                                            setSortConfig({field: 'amount', direction: 'desc', name: 'Сумма больше'})
-                                        } else {
-                                            setSortConfig({field: 'amount', direction: 'asc', name: 'Сумма меньше'})
-                                        }
                                     } else {
+                                        setSortConfig({field: 'datetime', direction: 'asc', name: 'Старые'})
+                                    }
+                                } else {
+                                    setSortConfig({field: 'datetime', direction: 'desc', name: 'Новые'})
+                                }
+                            }}
+                        >Дата{sortArrow('datetime')}</th>
+                        <th>Пользователь</th>
+                        <th>Телефон</th>
+                        <th>Карта</th>
+                        <th>Получатель</th>
+                        <th>Банк</th>
+                        <th>Метка</th>
+                        <th>Статус</th>
+                        <th
+                            onClick={() => {
+                                if (sortConfig.field === 'amount') {
+                                    if (sortConfig.direction === 'asc') {
                                         setSortConfig({field: 'amount', direction: 'desc', name: 'Сумма больше'})
-                                    }
-                                }}
-                            >Сумма{sortArrow('amount')}</th>
-                            <th
-                                onClick={() => {
-                                    if (sortConfig.field === 'amount_in_usd') {
-                                        if (sortConfig.direction === 'asc') {
-                                            setSortConfig({field: 'amount_in_usd', direction: 'desc', name: 'Сумма $ больше'})
-                                        } else {
-                                            setSortConfig({field: 'amount_in_usd', direction: 'asc', name: 'Сумма $ меньше'})
-                                        }
                                     } else {
-                                        setSortConfig({field: 'amount_in_usd', direction: 'desc', name: 'Сумма $ больше'})
+                                        setSortConfig({field: 'amount', direction: 'asc', name: 'Сумма меньше'})
                                     }
-                                }}
-
-                            >Сумма ${sortArrow('amount_in_usd')}</th>
-                            <th>Комментарий</th>
-                        </tr>
+                                } else {
+                                    setSortConfig({field: 'amount', direction: 'desc', name: 'Сумма больше'})
+                                }
+                            }}
+                        >Сумма{sortArrow('amount')}</th>
+                        <th>Комментарий</th>
+                    </tr>
                     </thead>
                     <tbody>
                     {filteredWithdraws.length > 0 &&
-                            filteredWithdraws.map((i) => (
-                                <tr key={i.id}>
-                                    <td>{i.datetime}</td>
-                                    <td>{i.user}</td>
-                                    <td>{i.phone}</td>
-                                    <td>{i.card}</td>
-                                    <td>{i.receiver}</td>
-                                    <td>{banks[i.bank]}</td>
-                                    <td
-                                        onDoubleClick={() => {setInputTagId(inputTagId === i.id ? null : i.id)}}
-                                    >
-                                        {inputTagId !== i.id ?
-                                            (<span>{i.tag}</span>)
-                                            :
-                                            (<input type="text" className='input-in-table' ref={inputRef} onKeyUp={(event) => {
-                                                if (event.key === 'Enter') {
-                                                    save_tag(i.id, event.target.value);
-                                                    setInputTagId(null);
-                                                }
-                                            }}/>)}
-                                    </td>
-                                    <td className={i.status}><span>{statuses[i.status]}</span></td>
-                                    <td>{i.currency}</td>
-                                    <td>{i.amount}</td>
-                                    <td>{i.amount_in_usd}</td>
-                                    <td>{i.comment}</td>
-                                </tr>
-                            ))
+                        filteredWithdraws.map((i) => (
+                            <tr key={i.id}>
+                                <td>{i.datetime}</td>
+                                <td>{i.user}</td>
+                                <td>{i.phone}</td>
+                                <td>{i.card}</td>
+                                <td>{i.receiver}</td>
+                                <td>{banks[i.bank]}</td>
+                                <td
+                                    onDoubleClick={() => {
+                                        setInputTagId(inputTagId === i.id ? null : i.id)
+                                    }}
+                                >
+                                    {inputTagId !== i.id ?
+                                        (<span>{i.tag}</span>)
+                                        :
+                                        (<input type="text" className='input-in-table' ref={inputRef}
+                                                onKeyUp={(event) => {
+                                                    if (event.key === 'Enter') {
+                                                        save_tag(i.id, event.target.value);
+                                                        setInputTagId(null);
+                                                    }
+                                                }}/>)}
+                                </td>
+                                <td className={i.status}><span>{statuses[i.status]}</span></td>
+                                <td>{i.amount}</td>
+                                <td>{i.comment}</td>
+                            </tr>
+                        ))
                     }
                     </tbody>
                 </table>

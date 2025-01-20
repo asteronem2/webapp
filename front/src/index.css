@@ -1260,15 +1260,18 @@ dialog.modal {
       .table {
         background: #ffffff;
         border-radius: 15px;
-        overflow: hidden;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        overflow-x: auto;
         -webkit-overflow-scrolling: touch;
 
         table {
           border-collapse: collapse;
           width: 100%;
           font-family: 'Roboto', sans-serif;
+
+          thead {
+            position: sticky;
+            top: 0;
+          }
 
           th {
             background: #f8fafc;
@@ -1370,6 +1373,15 @@ dialog.modal {
       }
 
       .withdraws {
+        position: relative;
+
+        &.fullscreen {
+          padding: 0 10px 10px;
+          
+          .filter_and_sort {
+            margin: 10px;
+          }
+        }
       }
 
       .topups {
@@ -1405,8 +1417,25 @@ dialog.modal {
           padding: 12px;
         }
       }
+
+      .fullscreen-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        margin: 10px;
+      }
       }
   }
+}
+
+.fullscreen {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  background: white;
 }
 
 @keyframes spin {

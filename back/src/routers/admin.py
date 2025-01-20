@@ -30,7 +30,7 @@ async def withdraws():
     withdraw_list = []
 
     count = 0
-    for i in range(15):
+    for i in range(60):
         count += 1
         amount = randint(1, 10000) / randint(1, 9)
         withdraw_list.append({
