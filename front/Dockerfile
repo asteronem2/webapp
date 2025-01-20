@@ -7,11 +7,11 @@ WORKDIR /usr/src/app
 
 # Копируем package.json и устанавливаем зависимости
 COPY package.json package-lock.json ./
-RUN npm install --silent
+RUN npm install
 
 # Копируем исходный код и собираем проект
 COPY . .
-RUN npm run build --verbose
+RUN npm run build
 
 # Стадия для Nginx
 FROM nginx:alpine
