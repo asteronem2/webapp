@@ -75,5 +75,5 @@ async def check_token(response: Response, token: str = Body(..., embed=True)):
 
     if answer.valid_token:
         access_token = AuthMethods.create_jwt_token({'sub': str(db_user.id)})
-        response.set_cookie(key='user_access_token', value=access_token, httponly=True, samesite='none', secure=False)
+        response.set_cookie(key='user_access_token', value=access_token, httponly=True, samesite='lax', secure=False)
     return answer
