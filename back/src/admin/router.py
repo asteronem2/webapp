@@ -1,26 +1,26 @@
 import re
 import shutil
 from datetime import datetime, timedelta, UTC
+from pathlib import Path
 from random import randint, choice
 from re import compile
 from typing import List, Literal, Annotated
-from pathlib import Path
 
 from fastapi import APIRouter, Body, Response, HTTPException, Query, UploadFile, File as File_fastapi
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 import config
-from src import utils
+from src import jwt
 from src.core import UserCore, CurrencyCore, WithdrawCore, FileCore
-from src.models import User, Currency
+from src.models import User
 
 router = APIRouter(prefix='', tags=['Админ панель'])
 
 @router.post('/auth/')
 async def auth(response: Response, token: str = Body(..., embed=True)):
     if token == config.ADMIN_TOKEN:
-        admin_access_token = utils.Auth.create_jwt_token({'sub': 'admin'})
+        admin_access_token = jwt.create_jwt_token({'sub': 'admin'})
         response.set_cookie(key='admin_access_token', value=admin_access_token, httponly=True, samesite='lax', secure=False)
         return {'access': True}
     else:

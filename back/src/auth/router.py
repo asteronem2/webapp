@@ -5,9 +5,7 @@ from typing import Literal, Union
 from fastapi import APIRouter, Response, Request, Body
 from pydantic import BaseModel
 
-import config
 from src import jwt
-from src.utils import Auth as AuthMethods
 from src.core import TgAuthTokenCore, UserCore
 from src.models import User
 
@@ -75,6 +73,6 @@ async def check_token(response: Response, token: str = Body(..., embed=True)):
         )
 
     if answer.valid_token:
-        access_token = AuthMethods.create_jwt_token({'sub': str(db_user.id)})
+        access_token = jwt.create_jwt_token({'sub': str(db_user.id)})
         response.set_cookie(key='user_access_token', value=access_token, httponly=True, samesite='lax', secure=False)
     return answer
