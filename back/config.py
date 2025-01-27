@@ -17,7 +17,7 @@ SECRET = os.environ.get('SECRET')
 
 TOKEN_LIFETIME = 12#minutes
 
-frontend_url = 'https://google.com/'
+frontend_url = 'https://o6men.site/'
 
 CRYPTOADDRESS = 'TEDepUJidzXfCkHtDmWhAPQiTibhiRE2C5'
 

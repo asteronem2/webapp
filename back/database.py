@@ -4,6 +4,7 @@ from sqlalchemy.orm import DeclarativeBase, declared_attr
 from config import DB_URL
 
 engine = create_async_engine(DB_URL)
+
 async_session_maker = async_sessionmaker(
     engine,
     class_=AsyncSession,

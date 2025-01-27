@@ -421,27 +421,6 @@ function Exchange({user}) {
         set_fields(fields.filter(dict => dict.id !== id));
     }
 
-    function clear_all() {
-        set_errors([{
-            id: 1,
-            card: false,
-            phone: false,
-            amount: false,
-        }])
-        set_fields([{
-            id: 1,
-            name: 'Вывод №1',
-            card: '',
-            phone: '+7 ',
-            receiver: '',
-            bank: 'sber',
-            amount: '',
-            currency: 'rubles',
-            comment: '',
-            minimized: false,
-        }])
-    }
-
     async function save_pattern() {
         if (check_all_fields()) {
             let new_fields = fields.map(dict => {
@@ -958,7 +937,7 @@ function Currencies() {
             <input
                 type='text'
                 placeholder="Поиск"
-                className="find"
+                className="search-input"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleSearch}

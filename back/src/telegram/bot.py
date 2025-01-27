@@ -55,7 +55,7 @@ async def start_message(message: Message):
     await bot.send_message(
         chat_id=user.id,
         text=f"""
-Привет, <b>{user.first_name}</b>, ты попал к ??? боту.
+Привет, <b>{user.first_name}</b>, ты попал к o6men боту.
 Ты можешь получить токен для входа или войти в веб-приложение: 
         """,
         reply_markup=IMarkup(inline_keyboard=[

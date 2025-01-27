@@ -6,6 +6,7 @@ from fastapi import APIRouter, Response, Request, Body
 from pydantic import BaseModel
 
 import config
+from src import jwt
 from src.utils import Auth as AuthMethods
 from src.core import TgAuthTokenCore, UserCore
 from src.models import User
@@ -41,7 +42,7 @@ async def check_auth(request: Request):
     if not token:
         return {'valid_auth': False, 'info': 'no cookies'}
 
-    result = await AuthMethods.decode_jwt_token(token)
+    result = await jwt.decode_jwt_token(token)
     if type(result) == str:
         return {'valid_auth': False, 'info': result}
 

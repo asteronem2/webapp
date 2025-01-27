@@ -1,15 +1,22 @@
-from typing import Literal, Union, List, Optional
-
-from sqlalchemy import select, delete, asc, desc, update
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import joinedload
+from typing import Union, Type, Literal, List, Optional
 
 from database import async_session_maker, Base
-from src.models import User, TgAuthToken, Withdraw, TopUp, ActiveApplication, Pattern, PatternField, Currency
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.engine import Result
+from sqlalchemy import select, update, delete, asc, desc
+from sqlalchemy.exc import SQLAlchemyError
+from src.models import User, TgAuthToken, Withdraw, TopUp, ActiveApplication, Pattern, PatternField, Currency, File
 
 
 class BaseCore:
-    model = None
+    model: Type[Base] = None
+
+    @staticmethod
+    async def execute(query) -> Result:
+        async with async_session_maker() as session:
+            session: AsyncSession
+            result: Result = await session.execute(query)
+            return result
 
     @classmethod
     async def find_all(cls, order_by: str = 'id', order_type: Literal['asc', 'desc'] = 'asc', limit: int = None, **filter_by) -> List[model]:
@@ -102,3 +109,6 @@ class PatternFieldCore(BaseCore):
 
 class CurrencyCore(BaseCore):
     model = Currency
+
+class FileCore(BaseCore):
+    model = File

@@ -829,7 +829,7 @@ body {
       color: #64748b;
       font-family: 'Roboto', sans-serif;
     
-      .find {
+      .search-input {
         width: 100%;
         background-color: #f1f5f9;
         height: 50px;
@@ -982,6 +982,33 @@ dialog.modal {
   border: none;
   white-space: nowrap;
 }
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%); /* Начальная маленькая точка */
+  background: rgba(100, 116, 139, 0.75);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  z-index: 1000;
+  border: none;
+  white-space: nowrap;
+  outline: none;
+}
+.tooltip {
+  background-color: #e5e7eb;
+  position: absolute;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  z-index: 1000;
+}
+
 
 .admin {
   color: #475569;
@@ -1131,80 +1158,6 @@ dialog.modal {
         }
       }
     }
-
-    .filter {
-      div {
-        width: 100%;
-        background: #f1f5f9;
-        border-radius: 15px;
-        padding: 10px;
-
-        .checkbox {
-          cursor: pointer;
-          display: flex;
-          gap: 5px;
-          background: #ffffff;
-          padding: 6px;
-          margin-top: 10px;
-          border-radius: 10px;
-        }
-
-        h3 {
-          width: 100%;
-          position: relative;
-          cursor: pointer;
-
-          &::after {
-            content: '▼'; /* Стрелка вниз по умолчанию */
-            font-size: 18px; /* Размер стрелки */
-            position: absolute;
-            top: 50%;
-            right: 20px; /* Отступ от правого края */
-            transform: translateY(-50%) scaleY(0.88); /* Центрируем по вертикали и сжимаем по оси Y */
-            transition: transform 0.3s ease; /* Плавный переход */
-            color: #475569;
-          }
-        }
-
-        &.minimized {
-          h3 {
-            &::after {
-              content: '▲';
-            }
-          }
-        }
-
-        &.amount {
-          h3 {
-            cursor: default;
-            &::after {
-              content: '';
-            }
-          }
-
-          .input-text {
-            margin-top: 10px;
-            width: 30%;
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 15px;
-            background: #ffffff;
-            transition: all 0.3s ease;
-
-            &:focus {
-              outline: none;
-              border-color: #4f46e5;
-              box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-            }
-            &.error-input {
-              border: 2px solid rgb(255, 124, 124);
-              box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
-            }
-          }
-        }
-      }
-    }
   }
 
   .container {
@@ -1325,6 +1278,14 @@ dialog.modal {
                 border-radius: 10px;
               }
             }
+            &.correction {
+              span {
+                color: rgb(200, 128, 200);
+                background: rgba(200, 128, 200, 0.3);
+                padding: 5px;
+                border-radius: 10px;
+              }
+            }
           }
 
           .input-in-table {
@@ -1373,13 +1334,12 @@ dialog.modal {
       }
 
       .withdraws {
-        position: relative;
 
         &.fullscreen {
           padding: 0 10px 10px;
-          
-          .filter_and_sort {
-            margin: 10px;
+
+          .top {
+            padding: 20px 20px 20px 0;
           }
         }
       }
@@ -1404,27 +1364,166 @@ dialog.modal {
         }
       }
 
-      .filter_and_sort {
-        display: flex;
-        margin-bottom: 10px;
-        gap: 10px;
-
-        button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid #e2e8f0;
-          padding: 12px;
+      .fullscreen-button {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        &:hover {
+          transform: scale(1.25);
         }
       }
 
-      .fullscreen-button {
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px 20px 0;
+
+        .only-waiting {
+          display: inline-flex; /* или inline-block */
+          align-items: center;  /* выравнивание по вертикали */
+          gap: 5px;
+        }
+
+      }
+
+      .search-input {
+        width: 50%;
+        background-color: #f1f5f9;
+        height: 50px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+        font-size: 18px;
+        color: #334155;
+        border: 2px solid #e2e8f0;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        outline: none;
+
+        &::placeholder {
+          color: #a0aec0;
+        }
+
+        &:focus {
+          border-color: #4338ca;
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+      }
+
+      .choice-modal {
+        min-width: 225px;
         position: absolute;
-        top: 10px;
-        right: 10px;
-        margin: 10px;
+        z-index: 1000;
+        background-color: #f1f5f9;
+        padding: 15px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .checkbox {
+          cursor: pointer;
+          display: flex;
+          gap: 5px;
+          background: #ffffff;
+          padding: 6px;
+          border-radius: 10px;
+          margin: 5px 0;
+          width: 100%;
+        }
+
+        button {
+          width: 50%;
+          padding: 10px;
+          margin: 5px
+        }
       }
+
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding: 10px;
+        background: #f8fafc;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        user-select: none;
+
+        input,
+        select {
+          width: 6%;
+          padding: 12px;
+          font-size: 16px;
+          border: 1px solid #e2e8f0;
+          border-radius: 15px;
+          background: #ffffff;
+          transition: all 0.3s ease;
+
+          &:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+          }
+          &.error-input {
+            border: 2px solid rgb(255, 124, 124);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+          }
+        }
+
+        select {
+          appearance: none;
+          background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%234f46e5" viewBox="0 0 24 24"><path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z"/></svg>') no-repeat right 12px center;
+          background-size: 14px;
+        }
+
+        .pagination-buttons {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          svg {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            fill: #475569;
+            transition: fill 0.3s ease;
+
+            &:hover {
+              fill: #4338ca;
+            }
+          }
+
+          div {
+            display: flex;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease;
+
+            &:hover {
+              background: #4338ca;
+              color: #ffffff;
+            }
+
+            &.active {
+              background: #4338ca;
+              color: #ffffff;
+            }
+          }
+        }
       }
+    }
   }
 }
 
@@ -1436,6 +1535,18 @@ dialog.modal {
   height: 100vh;
   overflow: auto;
   background: white;
+}
+
+.text-to-click {
+  cursor: pointer;
+  &:hover {
+    color: rgba(35, 91, 227, 0.5);
+  }
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease;
 }
 
 @keyframes spin {

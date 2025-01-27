@@ -1,7 +1,6 @@
 import secrets
 import string
-from datetime import datetime, timedelta, timezone
-from email.policy import default
+from datetime import datetime, timedelta
 from typing import List, Annotated, Literal
 
 from sqlalchemy import Integer, func, ForeignKey, DateTime, BigInteger
@@ -116,3 +115,7 @@ class Currency(Base):
     percent: Mapped[float]
     min_amount: Mapped[float]
     commission_step: Mapped[float]
+
+class File(Base):
+    id = mapped_column(Integer, primary_key=True)
+    path: Mapped[str]
