@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 import config
+from config import BANKS
 from src import jwt
 from src.core import UserCore, CurrencyCore, WithdrawCore, FileCore
 from src.models import User
@@ -60,6 +61,7 @@ class WithdrawsResponse(BaseModel):
         total_pages: int
         total_amount: float
         page_amount: float
+        banks: dict = BANKS
 
     withdraws: List[Withdraw]
     meta: Meta
@@ -118,8 +120,12 @@ async def withdraws(params: Annotated[WithdrawParams, Query()]) -> WithdrawsResp
         if search:
             list_searched = []
             for key, value in  i.__dict__.items():
-                if search in str(value):
-                    re_res = re.compile(search).search(str(value))
+                if key == "bank":
+                    value = BANKS[value]
+                elif key == "datetime":
+                    value = datetime.fromtimestamp(value).strftime("%d.%m.%Y %H:%M:%S")
+                if search.lower() in str(value).lower():
+                    re_res = re.compile(search.lower()).search(str(value).lower())
                     list_searched.append(Withdraw.Searched(
                         field=key,
                         offset=re_res.start(),

@@ -22,3 +22,9 @@ frontend_url = 'https://o6men.site/'
 CRYPTOADDRESS = 'TEDepUJidzXfCkHtDmWhAPQiTibhiRE2C5'
 
 ADMIN_TOKEN = '197685:DF3KijgREdqjzRFuylb0MTIh'
+
+BANKS = {
+    'tbank': 'ТБанк (Тинькофф)',
+    'sber': 'Сбер',
+    'alfa': 'Альфа'
+}
