@@ -1376,10 +1376,8 @@ dialog.modal {
           gap: 5px;
           cursor: pointer;
           &.waiting {
-            span {
+            svg {
               color: rgb(200, 200, 128);
-              background: rgba(200, 200, 128, 0.3);
-              padding: 5px;
               border-radius: 10px;
             }
           }
